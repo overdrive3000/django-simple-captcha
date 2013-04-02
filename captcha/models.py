@@ -1,5 +1,6 @@
 from captcha.conf import settings as captcha_settings
-from django.db import models
+# from django.db import models
+from mongoengine import *
 from django.conf import settings
 import datetime
 import random
@@ -33,11 +34,16 @@ def get_safe_now():
     return datetime.datetime.now()
 
 
-class CaptchaStore(models.Model):
-    challenge = models.CharField(blank=False, max_length=32)
-    response = models.CharField(blank=False, max_length=32)
-    hashkey = models.CharField(blank=False, max_length=40, unique=True)
-    expiration = models.DateTimeField(blank=False)
+class CaptchaStore(Document):
+    challenge = StringField(max_length=32)
+    response = StringField(max_length=32)
+    hashkey = StringField(max_length=40)
+    expiration = DateTimeField()
+    meta = {
+        'indexes': [
+            {'fields': ['hashkey'], 'unique': True},
+        ],
+    }
 
     def save(self, *args, **kwargs):
         #import ipdb; ipdb.set_trace()

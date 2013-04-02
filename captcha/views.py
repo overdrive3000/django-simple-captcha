@@ -2,7 +2,7 @@ from captcha.conf import settings
 from captcha.helpers import captcha_image_url
 from captcha.models import CaptchaStore
 from django.http import HttpResponse, Http404
-from django.shortcuts import get_object_or_404
+from mongoengine.django.shortcuts import get_document_or_404
 from django.utils import simplejson as json
 import random
 import re
@@ -26,7 +26,7 @@ NON_DIGITS_RX = re.compile('[^\d]')
 
 
 def captcha_image(request, key):
-    store = get_object_or_404(CaptchaStore, hashkey=key)
+    store = get_document_or_404(CaptchaStore, hashkey=key)
     text = store.challenge
 
     if settings.CAPTCHA_FONT_PATH.lower().strip().endswith('ttf'):
@@ -89,7 +89,7 @@ def captcha_image(request, key):
 
 def captcha_audio(request, key):
     if settings.CAPTCHA_FLITE_PATH:
-        store = get_object_or_404(CaptchaStore, hashkey=key)
+        store = get_document_or_404(CaptchaStore, hashkey=key)
         text = store.challenge
         if 'captcha.helpers.math_challenge' == settings.CAPTCHA_CHALLENGE_FUNCT:
             text = text.replace('*', 'times').replace('-', 'minus')
